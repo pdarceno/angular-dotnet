@@ -6,17 +6,21 @@ namespace backend.Models
     public class Pizza
     {
         [Key]
-        public int PizzaId { get; set; }
+        public required string PizzaId { get; set; }
 
-        [Column(TypeName = "int")]
-        public int PizzaTypeId { get; set; }
+
+        [ForeignKey(nameof(PizzaType))]
+        public required string PizzaTypeId { get; set; }
 
         [Column(TypeName = "nvarchar(20)")]
+        [Required]
+        [StringLength(20)]
         public string Size { get; set; } = "";
 
         [Column(TypeName = "decimal(18,2)")]
+        [Range(0.01, 999.99)]
         public decimal Price { get; set; }
 
-        public PizzaType? PizzaType { get; set; }
+        public PizzaType PizzaType { get; set; } = null!;
     }
 }   

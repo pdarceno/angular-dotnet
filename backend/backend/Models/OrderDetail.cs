@@ -8,16 +8,17 @@ namespace backend.Models
         [Key]
         public int OrderDetailId { get; set; }
 
-        [Column(TypeName = "int")]
         public int OrderId { get; set; }
 
-        [Column(TypeName = "int")]
-        public int PizzaId { get; set; }
+        public required string PizzaId { get; set; }
 
         [Column(TypeName = "int")]
         public int Quantity { get; set; }
 
-        public Order? Order { get; set; }
-        public Pizza? Pizza { get; set; }
+        [ForeignKey("OrderId")]
+        public Order Order { get; set; } = null!;
+
+        [ForeignKey("PizzaId")]
+        public Pizza Pizza { get; set; } = null!;
     }
 }
