@@ -1,0 +1,16 @@
+src
+├── app
+│   ├── order-details
+│   │   ├── order-details.component.ts|.html
+│   │   └── order-detail-form
+│   │       └── order-detail-form.component.ts|.html
+│   ├── pizza-details
+│   │   ├── pizza-details.component.ts|.html
+│   │   └── pizza-detail-form
+│   │       └── pizza-detail-form.component.ts|.html
+│   ├── shared
+│   │   ├── fronend-detail.service.ts
+│   │   └── fronend-detail.model.ts
+│   └── app.module.ts
+├── styles.css (global css rules)
+└── index.html (cdn path for bootstrap & fa icons)
