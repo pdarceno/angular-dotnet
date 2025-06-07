@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Globalization;
+using System.IO;
+using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend.Models;
+using CsvHelper;
 
 namespace backend.Controllers
 {
@@ -99,9 +103,48 @@ namespace backend.Controllers
             return NoContent();
         }
 
+        [HttpPost("upload-csv")]
+        public async Task<IActionResult> UploadCsv(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            var pizzaTypes = new List<PizzaType>();
+
+            using (var stream = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
+            using (var csv = new CsvReader(stream, CultureInfo.InvariantCulture))
+            {
+                csv.Context.RegisterClassMap<PizzaTypeCsvMap>();
+                try
+                {
+                    pizzaTypes = csv.GetRecords<PizzaType>().ToList();
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest($"Invalid CSV format: {ex.Message}");
+                }
+            }
+
+            await _context.PizzaTypes.AddRangeAsync(pizzaTypes);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { count = pizzaTypes.Count });
+        }
+
         private bool PizzaTypeExists(string id)
         {
             return _context.PizzaTypes.Any(e => e.PizzaTypeId == id);
+        }
+    }
+
+    public sealed class PizzaTypeCsvMap : CsvHelper.Configuration.ClassMap<PizzaType>
+    {
+        public PizzaTypeCsvMap()
+        {
+            Map(m => m.PizzaTypeId).Name("pizza_type_id");
+            Map(m => m.Name).Name("name");
+            Map(m => m.Category).Name("category");
+            Map(m => m.Ingredients).Name("ingredients");
         }
     }
 }
