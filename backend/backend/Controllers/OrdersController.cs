@@ -99,6 +99,9 @@ namespace backend.Controllers
             return NoContent();
         }
 
+                await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT OrderDetails OFF");
+                // Optional: Reseed identity if necessary (make sure you really need this!)
+                // await _context.Database.ExecuteSqlRawAsync("DBCC CHECKIDENT ('Orders', RESEED)");
         private bool OrderExists(int id)
         {
             return _context.Orders.Any(e => e.OrderId == id);
