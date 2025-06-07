@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PizzaApi.Models
+namespace backend.Models
 {
     public class Pizza
     {
@@ -11,7 +11,7 @@ namespace PizzaApi.Models
         [Column(TypeName = "int")]
         public int PizzaTypeId { get; set; }
 
-        [Column(TypeName = "varchar(20)")]
+        [Column(TypeName = "nvarchar(20)")]
         public string Size { get; set; } = "";
 
         [Column(TypeName = "decimal(18,2)")]
