@@ -16,6 +16,6 @@ namespace backend.Models
         [Column(TypeName = "time")]
         public TimeOnly Time { get; set; }
 
-        public ICollection<OrderDetail>? OrderDetails { get; set; }
+        public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
     }
 }
