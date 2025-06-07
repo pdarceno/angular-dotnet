@@ -12,7 +12,7 @@ using backend.Models;
 namespace backend.Migrations
 {
     [DbContext(typeof(PizzaDbContext))]
-    [Migration("20250607174900_First Migration")]
+    [Migration("20250607185601_First Migration")]
     partial class FirstMigration
     {
         /// <inheritdoc />
@@ -55,8 +55,9 @@ namespace backend.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PizzaId")
-                        .HasColumnType("int");
+                    b.Property<string>("PizzaId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -72,20 +73,19 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Pizza", b =>
                 {
-                    b.Property<int>("PizzaId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("PizzaId")
+                        .HasColumnType("nvarchar(450)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PizzaId"));
-
-                    b.Property<int>("PizzaTypeId")
-                        .HasColumnType("int");
+                    b.Property<string>("PizzaTypeId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Size")
                         .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("PizzaId");
@@ -97,22 +97,22 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.PizzaType", b =>
                 {
-                    b.Property<int>("PizzaTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PizzaTypeId"));
+                    b.Property<string>("PizzaTypeId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Category")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Ingredients")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("PizzaTypeId");

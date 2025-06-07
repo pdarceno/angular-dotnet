@@ -44,7 +44,7 @@ namespace backend.Controllers
         // PUT: api/PizzaTypes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPizzaType(int id, PizzaType pizzaType)
+        public async Task<IActionResult> PutPizzaType(string id, PizzaType pizzaType)
         {
             if (id != pizzaType.PizzaTypeId)
             {
@@ -99,7 +99,7 @@ namespace backend.Controllers
             return NoContent();
         }
 
-        private bool PizzaTypeExists(int id)
+        private bool PizzaTypeExists(string id)
         {
             return _context.PizzaTypes.Any(e => e.PizzaTypeId == id);
         }
