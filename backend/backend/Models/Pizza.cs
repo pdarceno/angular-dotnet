@@ -22,5 +22,7 @@ namespace backend.Models
         public decimal Price { get; set; }
 
         public PizzaType PizzaType { get; set; } = null!;
+        public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+
     }
 }   
