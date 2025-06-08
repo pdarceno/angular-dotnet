@@ -62,17 +62,89 @@ namespace backend.Controllers
 
         // GET: api/PizzaTypes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PizzaType>> GetPizzaType(int id)
+        public async Task<ActionResult<PizzaTypeDto>> GetPizzaType(string id)
         {
-            var pizzaType = await _context.PizzaTypes.FindAsync(id);
+            var pizzaType = await _context.PizzaTypes
+                .Include(pt => pt.Pizzas)
+                .FirstOrDefaultAsync(pt => pt.PizzaTypeId == id);
 
             if (pizzaType == null)
-            {
                 return NotFound();
-            }
 
-            return pizzaType;
+            var totals = await _context.OrderDetails
+                .GroupBy(od => od.PizzaId)
+                .Select(g => new { PizzaId = g.Key, TotalSold = g.Sum(od => od.Quantity) })
+                .ToDictionaryAsync(g => g.PizzaId, g => g.TotalSold);
+
+            var dto = new PizzaTypeDto
+            {
+                PizzaTypeId = pizzaType.PizzaTypeId,
+                Name = pizzaType.Name,
+                Category = pizzaType.Category,
+                Ingredients = pizzaType.Ingredients,
+                Pizzas = pizzaType.Pizzas.Select(p => new PizzaDto
+                {
+                    PizzaId = p.PizzaId,
+                    Size = p.Size,
+                    Price = p.Price,
+                    TotalSold = totals.TryGetValue(p.PizzaId, out var sold) ? sold : 0
+                }).ToList()
+            };
+
+            return Ok(dto);
         }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchPizzaTypes(
+        [FromQuery] string? name = null,
+        [FromQuery] string? category = null,
+        [FromQuery] string? ingredientContains = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
+        {
+            var totals = await _context.OrderDetails
+                .GroupBy(od => od.PizzaId)
+                .Select(g => new { PizzaId = g.Key, TotalSold = g.Sum(od => od.Quantity) })
+                .ToDictionaryAsync(g => g.PizzaId, g => g.TotalSold);
+
+            var query = _context.PizzaTypes
+                .Include(pt => pt.Pizzas)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(name))
+                query = query.Where(pt => pt.Name.Contains(name));
+
+            if (!string.IsNullOrWhiteSpace(category))
+                query = query.Where(pt => pt.Category == category);
+
+            if (!string.IsNullOrWhiteSpace(ingredientContains))
+                query = query.Where(pt => pt.Ingredients.Contains(ingredientContains));
+
+            var pizzaTypes = await query
+                .OrderBy(pt => pt.PizzaTypeId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var result = pizzaTypes.Select(pt => new PizzaTypeDto
+            {
+                PizzaTypeId = pt.PizzaTypeId,
+                Name = pt.Name,
+                Category = pt.Category,
+                Ingredients = pt.Ingredients,
+                Pizzas = pt.Pizzas.Select(p => new PizzaDto
+                {
+                    PizzaId = p.PizzaId,
+                    Size = p.Size,
+                    Price = p.Price,
+                    TotalSold = totals.TryGetValue(p.PizzaId, out var sold) ? sold : 0
+                }).ToList()
+            }).ToList();
+
+            return Ok(result);
+        }
+
+
 
         [HttpPost("upload-csv")]
         public async Task<IActionResult> UploadCsv(IFormFile file)

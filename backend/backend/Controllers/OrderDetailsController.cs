@@ -59,16 +59,83 @@ namespace backend.Controllers
 
         // GET: api/OrderDetails/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<OrderDetail>> GetOrderDetail(int id)
+        public async Task<ActionResult<OrderDto>> GetOrderDetail(int id)
         {
-            var orderDetail = await _context.OrderDetails.FindAsync(id);
+            var order = await _context.Orders
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Pizza)
+                        .ThenInclude(p => p.PizzaType)
+                .FirstOrDefaultAsync(o => o.OrderId == id);
 
-            if (orderDetail == null)
-            {
+            if (order == null)
                 return NotFound();
-            }
 
-            return orderDetail;
+            var dto = new OrderDto
+            {
+                OrderId = order.OrderId,
+                Date = order.Date,
+                Time = order.Time,
+                Details = order.OrderDetails.Select(od => new OrderDetailDto
+                {
+                    OrderDetailId = od.OrderDetailId,
+                    PizzaName = od.Pizza.PizzaType.Name,
+                    Size = od.Pizza.Size,
+                    Quantity = od.Quantity,
+                    Price = od.Pizza.Price
+                }).ToList()
+            };
+
+            return Ok(dto);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchOrderDetails(
+        [FromQuery] DateOnly? date = null,
+        [FromQuery] string? pizzaName = null,
+        [FromQuery] string? size = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
+        {
+            var query = _context.Orders
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Pizza)
+                        .ThenInclude(p => p.PizzaType)
+                .AsQueryable();
+
+            if (date.HasValue)
+                query = query.Where(o => o.Date == date.Value);
+
+            if (!string.IsNullOrWhiteSpace(pizzaName))
+                query = query.Where(o =>
+                    o.OrderDetails.Any(od =>
+                        od.Pizza.PizzaType.Name.Contains(pizzaName)));
+
+            if (!string.IsNullOrWhiteSpace(size))
+                query = query.Where(o =>
+                    o.OrderDetails.Any(od =>
+                        od.Pizza.Size.Equals(size, StringComparison.OrdinalIgnoreCase)));
+
+            var orders = await query
+                .OrderBy(o => o.OrderId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(o => new OrderDto
+                {
+                    OrderId = o.OrderId,
+                    Date = o.Date,
+                    Time = o.Time,
+                    Details = o.OrderDetails.Select(od => new OrderDetailDto
+                    {
+                        OrderDetailId = od.OrderDetailId,
+                        PizzaName = od.Pizza.PizzaType.Name,
+                        Size = od.Pizza.Size,
+                        Quantity = od.Quantity,
+                        Price = od.Pizza.Price
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return Ok(orders);
         }
 
         [HttpPost("upload-csv")]
