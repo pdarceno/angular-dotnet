@@ -10,11 +10,15 @@ export class FrontendDetailService {
   url: string = environment.apiBaseUrl;
   constructor(private http: HttpClient) {}
 
-  getOrderDetails() {
-    return this.http.get<Order[]>(this.url + '/OrderDetails');
+  getOrderDetails(page: number = 1, pageSize: number = 10) {
+    return this.http.get<Order[]>(
+      `${this.url}/OrderDetails?page=${page}&pageSize=${pageSize}`
+    );
   }
 
-  getPizzaDetails() {
-    return this.http.get<Pizza[]>(this.url + '/Pizzas');
+  getPizzaDetails(page: number = 1, pageSize: number = 10) {
+    return this.http.get<Pizza[]>(
+      `${this.url}/Pizzas?page=${page}&pageSize=${pageSize}`
+    );
   }
 }

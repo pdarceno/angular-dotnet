@@ -1,4 +1,3 @@
-<h2>Order Dashboard</h2>
 <table border="1" cellpadding="5" cellspacing="0">
   <thead>
     <tr>
@@ -19,3 +18,12 @@
     </tr>
   </tbody>
 </table>
+
+<!-- Pagination Controls -->
+<div style="margin-top: 10px">
+  <button (click)="goToPreviousPage()" [disabled]="currentPage === 1">
+    Prev
+  </button>
+  <span>Page {{ currentPage }}</span>
+  <button (click)="goToNextPage()">Next</button>
+</div>
