@@ -27,4 +27,27 @@ export class FrontendDetailService {
       `${this.url}/Pizzas?page=${page}&pageSize=${pageSize}`
     );
   }
+
+  searchPizzas(
+    pizzaTypeName: string,
+    category: string,
+    size: string,
+    minPrice?: number,
+    maxPrice?: number,
+    page: number = 1,
+    pageSize: number = 10
+  ) {
+    let params = new URLSearchParams();
+    if (pizzaTypeName) params.append('pizzaTypeName', pizzaTypeName);
+    if (category) params.append('category', category);
+    if (size) params.append('size', size);
+    if (minPrice !== undefined) params.append('minPrice', minPrice.toString());
+    if (maxPrice !== undefined) params.append('maxPrice', maxPrice.toString());
+    params.append('page', page.toString());
+    params.append('pageSize', pageSize.toString());
+
+    return this.http.get<Pizza[]>(
+      `${this.url}/Pizzas/search?${params.toString()}`
+    );
+  }
 }

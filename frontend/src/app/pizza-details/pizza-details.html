@@ -1,1 +1,59 @@
-<p>pizza-details works!</p>
+<h1>Pizza Details</h1>
+
+<!-- Search Bar -->
+<div style="margin-bottom: 10px">
+  <select [(ngModel)]="searchField">
+    <option value="pizzaTypeName">Type Name</option>
+    <option value="category">Category</option>
+    <option value="size">Size</option>
+  </select>
+
+  <input
+    type="text"
+    placeholder="Search value..."
+    [(ngModel)]="searchQuery"
+    (keyup.enter)="searchPizzas()"
+  />
+</div>
+
+<table border="1" cellpadding="5" cellspacing="0" width="100%">
+  <thead>
+    <tr>
+      <th>Pizza ID</th>
+      <th>Type Name</th>
+      <th>Category</th>
+      <th>Size</th>
+      <th>Price</th>
+      <th>Total Sold</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let pizza of pizzas" style="cursor: pointer">
+      <td>{{ pizza.pizzaId }}</td>
+      <td>{{ pizza.pizzaTypeName }}</td>
+      <td>{{ pizza.category }}</td>
+      <td>{{ pizza.size }}</td>
+      <td>{{ pizza.price | currency: 'USD' }}</td>
+      <td>{{ pizza.totalSold }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Pagination Controls -->
+<div style="margin-top: 10px">
+  <button (click)="goToPreviousPage()" [disabled]="currentPage === 1">
+    Prev
+  </button>
+  <span>Page {{ currentPage }}</span>
+  <button (click)="goToNextPage()">Next</button>
+</div>
+
+<!-- Selected Pizza Detail -->
+<div *ngIf="selectedPizza" style="margin-top: 20px">
+  <h3>Pizza Details (ID: {{ selectedPizza.pizzaId }})</h3>
+  <p><strong>Type:</strong> {{ selectedPizza.pizzaTypeName }}</p>
+  <p><strong>Category:</strong> {{ selectedPizza.category }}</p>
+  <p><strong>Size:</strong> {{ selectedPizza.size }}</p>
+  <p><strong>Price:</strong> {{ selectedPizza.price | currency:'USD' }}</p>
+  <p><strong>Total Sold:</strong> {{ selectedPizza.totalSold }}</p>
+</div>
