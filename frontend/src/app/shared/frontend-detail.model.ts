@@ -1,8 +1,7 @@
 // mapped to backend's DTO
 export interface Order {
   orderId: number;
-  date: string; // ISO date string (e.g., '2024-01-01')
-  time: string; // string representation of time (e.g., '12:30:00')
+  dateTime: string;
   totalPrice: number;
   pizzaCount: number;
   details: OrderDetail[];
