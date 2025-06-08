@@ -1,11 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FrontendDetailService } from '../shared/frontend-detail.model';
 
 @Component({
   selector: 'app-pizza-details',
   imports: [],
   templateUrl: './pizza-details.html',
-  styles: ``
+  styles: ``,
 })
-export class PizzaDetails {
-
+export class PizzaDetialsComponent implements OnInit {
+  constructor(public service: FrontendDetailService) {}
+  ngOnInit(): void {
+    this.service.getPizzaDetails();
+  }
 }
