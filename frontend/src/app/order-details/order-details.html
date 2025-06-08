@@ -1,4 +1,14 @@
-<table border="1" cellpadding="5" cellspacing="0">
+<h1>Order Details</h1>
+
+<!-- Search Bar -->
+<input
+  type="text"
+  placeholder="Search by pizza name..."
+  [(ngModel)]="searchQuery"
+  (keyup.enter)="searchOrders()"
+/>
+
+<table border="1" cellpadding="5" cellspacing="0" width="100%">
   <thead>
     <tr>
       <th>Order ID</th>
@@ -9,13 +19,38 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let order of orders">
-      <td>{{ order.orderId }}</td>
-      <td>{{ order.date }}</td>
-      <td>{{ order.time }}</td>
-      <td>{{ order.pizzaCount }}</td>
-      <td>{{ order.totalPrice | currency: 'USD' }}</td>
-    </tr>
+    <ng-container *ngFor="let order of orders">
+      <tr (click)="toggleExpanded(order.orderId)" style="cursor: pointer">
+        <td>{{ order.orderId }}</td>
+        <td>{{ order.date }}</td>
+        <td>{{ order.time }}</td>
+        <td>{{ order.pizzaCount }}</td>
+        <td>{{ order.totalPrice | currency: 'USD' }}</td>
+      </tr>
+      <!-- Pizza details row -->
+      <tr *ngIf="expandedOrderId === order.orderId">
+        <td colspan="5">
+          <table border="1" cellpadding="5" cellspacing="0" width="100%">
+            <thead>
+              <tr>
+                <th>Pizza</th>
+                <th>Size</th>
+                <th>Quantity</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of order.details">
+                <td>{{ d.pizzaName }}</td>
+                <td>{{ d.size }}</td>
+                <td>{{ d.quantity }}</td>
+                <td>{{ d.price | currency: 'USD' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </ng-container>
   </tbody>
 </table>
 
