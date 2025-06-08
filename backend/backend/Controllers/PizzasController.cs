@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Globalization;
-using System.IO;
-using System.Text;
+﻿using backend.DTOs;
+using backend.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using backend.Models;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
@@ -27,9 +28,39 @@ namespace backend.Controllers
 
         // GET: api/Pizzas
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pizza>>> GetPizzas()
+        public async Task<IActionResult> GetPizzas(int page = 1, int pageSize = 20)
         {
-            return await _context.Pizzas.ToListAsync();
+            // Build a lookup first (1 query)
+            var totals = await _context.OrderDetails
+                .GroupBy(od => od.PizzaId)
+                .Select(g => new { PizzaId = g.Key, TotalSold = g.Sum(od => od.Quantity) })
+                .ToDictionaryAsync(g => g.PizzaId, g => g.TotalSold);
+
+            // Then project (1 query, no subqueries)
+            var pizzas = await _context.Pizzas
+                .Include(p => p.PizzaType)
+                .OrderBy(p => p.PizzaId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new PizzaDto
+                {
+                    PizzaId = p.PizzaId,
+                    PizzaTypeName = p.PizzaType.Name,
+                    Category = p.PizzaType.Category,
+                    Size = p.Size,
+                    Price = p.Price,
+                    TotalSold = 0 // default, will be updated below
+                })
+                .ToListAsync();
+
+            // Apply the lookup in memory
+            foreach (var pizza in pizzas)
+            {
+                if (totals.TryGetValue(pizza.PizzaId, out var sold))
+                    pizza.TotalSold = sold;
+            }
+
+            return Ok(pizzas);
         }
 
         // GET: api/Pizzas/5
