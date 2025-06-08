@@ -22,10 +22,6 @@ export class FrontendDetailService {
     );
   }
 
-  getOrderDetailById(id: number) {
-    return this.http.get<Order>(`${this.url}/OrderDetails/${id}`);
-  }
-
   getPizzaDetails(page: number = 1, pageSize: number = 10) {
     return this.http.get<Pizza[]>(
       `${this.url}/Pizzas?page=${page}&pageSize=${pageSize}`

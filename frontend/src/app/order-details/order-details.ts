@@ -45,13 +45,6 @@ export class OrderDetailsComponent implements OnInit {
       });
   }
 
-  viewOrderDetails(orderId: number) {
-    this.service.getOrderDetailById(orderId).subscribe({
-      next: (data) => (this.selectedOrder = data),
-      error: (err) => console.error(err),
-    });
-  }
-
   goToNextPage() {
     this.currentPage++;
     this.searchQuery ? this.searchOrders() : this.loadOrders();
