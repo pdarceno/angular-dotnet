@@ -49,7 +49,13 @@ export class StatsDetailsComponent implements OnInit {
       this.peakHoursOptions = {
         series: [{ name: 'Orders', data: data.map((p) => p.orderCount) }],
         chart: { height: 350, type: 'bar' },
-        xaxis: { categories: data.map((p) => `${p.hour}:00`) },
+        xaxis: {
+          categories: data.map((p) => {
+            const hour = p.hour % 12 === 0 ? 12 : p.hour % 12;
+            const ampm = p.hour < 12 ? 'AM' : 'PM';
+            return `${hour.toString().padStart(2, '0')}:00 ${ampm}`;
+          }),
+        },
         title: { text: 'Peak Ordering Hours', align: 'center' },
         dataLabels: { enabled: true },
       };
@@ -59,7 +65,15 @@ export class StatsDetailsComponent implements OnInit {
       this.dailyOrdersOptions = {
         series: [{ name: 'Orders', data: data.map((p) => p.orders) }],
         chart: { height: 350, type: 'line' },
-        xaxis: { categories: data.map((p) => p.date) },
+        xaxis: {
+          categories: data.map((p) => {
+            const date = new Date(p.date);
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            const yyyy = date.getFullYear();
+            return `${mm}-${dd}-${yyyy}`;
+          }),
+        },
         title: { text: 'Daily Orders Over Time', align: 'center' },
         dataLabels: { enabled: false },
       };
