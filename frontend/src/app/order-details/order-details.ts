@@ -10,6 +10,6 @@ import { FrontendDetailService } from '../shared/frontend-detail.model';
 export class OrderDetailsComponent implements OnInit {
   constructor(public service: FrontendDetailService) {}
   ngOnInit() {
-    this.service.getDetails();
+    this.service.getOrderDetails();
   }
 }
