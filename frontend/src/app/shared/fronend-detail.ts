@@ -10,9 +10,9 @@ export class FrontendDetailService {
   url: string = environment.apiBaseUrl;
   constructor(private http: HttpClient) {}
 
-  getOrderDetails(page: number, pageSize: number) {
+  getOrderDetails(page: number, pageSize: number, sortDir: string = 'desc') {
     return this.http.get<Order[]>(
-      `${this.url}/OrderDetails?page=${page}&pageSize=${pageSize}`
+      `${this.url}/OrderDetails?page=${page}&pageSize=${pageSize}&sortDir=${sortDir}`
     );
   }
 
@@ -22,9 +22,13 @@ export class FrontendDetailService {
     );
   }
 
-  getPizzaDetails(page: number = 1, pageSize: number = 10) {
+  getPizzaDetails(
+    page: number = 1,
+    pageSize: number = 10,
+    sortDir: string = 'desc'
+  ) {
     return this.http.get<Pizza[]>(
-      `${this.url}/Pizzas?page=${page}&pageSize=${pageSize}`
+      `${this.url}/Pizzas?page=${page}&pageSize=${pageSize}&sortDir=${sortDir}`
     );
   }
 
