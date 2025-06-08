@@ -12,8 +12,8 @@ using backend.Models;
 namespace backend.Migrations
 {
     [DbContext(typeof(PizzaDbContext))]
-    [Migration("20250607185601_First Migration")]
-    partial class FirstMigration
+    [Migration("20250608090519_Start New Migration")]
+    partial class StartNewMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,11 +33,8 @@ namespace backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
 
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
-
-                    b.Property<TimeOnly>("Time")
-                        .HasColumnType("time");
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime");
 
                     b.HasKey("OrderId");
 
@@ -129,7 +126,7 @@ namespace backend.Migrations
                         .IsRequired();
 
                     b.HasOne("backend.Models.Pizza", "Pizza")
-                        .WithMany()
+                        .WithMany("OrderDetails")
                         .HasForeignKey("PizzaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -151,6 +148,11 @@ namespace backend.Migrations
                 });
 
             modelBuilder.Entity("backend.Models.Order", b =>
+                {
+                    b.Navigation("OrderDetails");
+                });
+
+            modelBuilder.Entity("backend.Models.Pizza", b =>
                 {
                     b.Navigation("OrderDetails");
                 });

@@ -30,11 +30,8 @@ namespace backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
 
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
-
-                    b.Property<TimeOnly>("Time")
-                        .HasColumnType("time");
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime");
 
                     b.HasKey("OrderId");
 

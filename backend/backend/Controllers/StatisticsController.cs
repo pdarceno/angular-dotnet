@@ -52,7 +52,7 @@ namespace backend.Controllers
         public async Task<IActionResult> GetPeakHours()
         {
             var hourly = await _context.Orders
-                .GroupBy(o => o.Time.Hour)
+                .GroupBy(o => o.DateTime.Hour)
                 .Select(g => new {
                     Hour = g.Key,
                     OrderCount = g.Count()
@@ -67,11 +67,12 @@ namespace backend.Controllers
         public async Task<IActionResult> GetDailyOrders()
         {
             var daily = await _context.Orders
-                .GroupBy(o => o.Date)
+                .GroupBy(o => o.DateTime.Date)
                 .Select(g => new {
                     Date = g.Key,
                     Orders = g.Count()
                 })
+                .OrderBy(x => x.Date)
                 .ToListAsync();
 
             return Ok(daily);
