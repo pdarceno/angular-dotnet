@@ -28,13 +28,23 @@ namespace backend.Controllers
 
         // GET: api/OrderDetails
         [HttpGet]
-        public async Task<IActionResult> GetOrderDetails(int page = 1, int pageSize = 20)
+        public async Task<IActionResult> GetOrderDetails(
+            int page = 1, 
+            int pageSize = 20, 
+            string sortDir = "asc")
         {
-            var orders = await _context.Orders
+            var query = _context.Orders
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Pizza)
                         .ThenInclude(p => p.PizzaType)
-                .OrderBy(o => o.OrderId)
+                .AsQueryable();
+
+            // Apply sorting direction
+            query = sortDir.ToLower() == "desc"
+                ? query.OrderByDescending(o => o.OrderId)
+                : query.OrderBy(o => o.OrderId);
+
+            var orders = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(o => new OrderDto

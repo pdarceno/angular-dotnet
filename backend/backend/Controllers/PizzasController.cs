@@ -28,18 +28,22 @@ namespace backend.Controllers
 
         // GET: api/Pizzas
         [HttpGet]
-        public async Task<IActionResult> GetPizzas(int page = 1, int pageSize = 20)
+        public async Task<IActionResult> GetPizzas(int page = 1, int pageSize = 20, string sortDir = "asc")
         {
-            // Build a lookup first (1 query)
             var totals = await _context.OrderDetails
                 .GroupBy(od => od.PizzaId)
                 .Select(g => new { PizzaId = g.Key, TotalSold = g.Sum(od => od.Quantity) })
                 .ToDictionaryAsync(g => g.PizzaId, g => g.TotalSold);
 
-            // Then project (1 query, no subqueries)
-            var pizzas = await _context.Pizzas
+            var query = _context.Pizzas
                 .Include(p => p.PizzaType)
-                .OrderBy(p => p.PizzaId)
+                .AsQueryable();
+
+            query = sortDir.ToLower() == "desc"
+                ? query.OrderByDescending(p => p.PizzaId)
+                : query.OrderBy(p => p.PizzaId);
+
+            var pizzas = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(p => new PizzaDto
@@ -49,11 +53,10 @@ namespace backend.Controllers
                     Category = p.PizzaType.Category,
                     Size = p.Size,
                     Price = p.Price,
-                    TotalSold = 0 // default, will be updated below
+                    TotalSold = 0
                 })
                 .ToListAsync();
 
-            // Apply the lookup in memory
             foreach (var pizza in pizzas)
             {
                 if (totals.TryGetValue(pizza.PizzaId, out var sold))
@@ -62,6 +65,7 @@ namespace backend.Controllers
 
             return Ok(pizzas);
         }
+
 
         // GET: api/Pizzas/5
         [HttpGet("{id}")]
