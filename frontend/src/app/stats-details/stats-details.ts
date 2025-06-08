@@ -25,33 +25,55 @@ export type ChartOptions = {
   styles: ``,
 })
 export class StatsDetailsComponent implements OnInit {
-  public chartOptions: Partial<ChartOptions> = {}; // 👈 initialize it
+  public bestsellersOptions: Partial<ChartOptions> = {};
+  public peakHoursOptions: Partial<ChartOptions> = {};
+  public dailyOrdersOptions: Partial<ChartOptions> = {};
+  public underperformersOptions: Partial<ChartOptions> = {};
 
   constructor(private statsService: StatisticsService) {}
 
   ngOnInit() {
     this.statsService.getBestsellers().subscribe((data) => {
-      this.chartOptions = {
-        series: [
-          {
-            name: 'Total Sold',
-            data: data.map((p) => p.totalSold),
-          },
-        ],
-        chart: {
-          height: 350,
-          type: 'bar',
-        },
+      this.bestsellersOptions = {
+        series: [{ name: 'Total Sold', data: data.map((p) => p.totalSold) }],
+        chart: { height: 350, type: 'bar' },
         xaxis: {
           categories: data.map((p) => p.pizzaTypeName + ' (' + p.size + ')'),
         },
-        title: {
-          text: 'Top 5 Bestselling Pizzas',
-          align: 'center',
+        title: { text: 'Top 5 Bestselling Pizzas', align: 'center' },
+        dataLabels: { enabled: true },
+      };
+    });
+
+    this.statsService.getPeakHours().subscribe((data) => {
+      this.peakHoursOptions = {
+        series: [{ name: 'Orders', data: data.map((p) => p.orderCount) }],
+        chart: { height: 350, type: 'bar' },
+        xaxis: { categories: data.map((p) => `${p.hour}:00`) },
+        title: { text: 'Peak Ordering Hours', align: 'center' },
+        dataLabels: { enabled: true },
+      };
+    });
+
+    this.statsService.getDailyOrders().subscribe((data) => {
+      this.dailyOrdersOptions = {
+        series: [{ name: 'Orders', data: data.map((p) => p.orders) }],
+        chart: { height: 350, type: 'line' },
+        xaxis: { categories: data.map((p) => p.date) },
+        title: { text: 'Daily Orders Over Time', align: 'center' },
+        dataLabels: { enabled: false },
+      };
+    });
+
+    this.statsService.getUnderperformers().subscribe((data) => {
+      this.underperformersOptions = {
+        series: [{ name: 'Not Ordered', data: data.map((p) => 1) }], // just count each item
+        chart: { height: 350, type: 'bar' },
+        xaxis: {
+          categories: data.map((p) => p.pizzaTypeName + ' (' + p.size + ')'),
         },
-        dataLabels: {
-          enabled: true,
-        },
+        title: { text: 'Pizzas Never Ordered', align: 'center' },
+        dataLabels: { enabled: false },
       };
     });
   }
