@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Globalization;
-using System.IO;
-using System.Text;
+﻿using backend.DTOs;
+using backend.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using backend.Models;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
@@ -27,10 +28,31 @@ namespace backend.Controllers
 
         // GET: api/OrderDetails
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderDetail>>> GetOrderDetails()
+        public async Task<IActionResult> GetOrderDetails()
         {
-            return await _context.OrderDetails.ToListAsync();
+            var orders = await _context.Orders
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Pizza)
+                        .ThenInclude(p => p.PizzaType)
+                .Select(o => new OrderDto
+                {
+                    OrderId = o.OrderId,
+                    Date = o.Date,
+                    Time = o.Time,
+                    Details = o.OrderDetails.Select(od => new OrderDetailDto
+                    {
+                        OrderDetailId = od.OrderDetailId,
+                        PizzaName = od.Pizza.PizzaType.Name,
+                        Size = od.Pizza.Size,
+                        Quantity = od.Quantity,
+                        Price = od.Pizza.Price
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return Ok(orders);
         }
+
 
         // GET: api/OrderDetails/5
         [HttpGet("{id}")]
