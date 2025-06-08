@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend.Models;
 using CsvHelper;
+using backend.DTOs;
 
 namespace backend.Controllers
 {
@@ -26,10 +27,38 @@ namespace backend.Controllers
 
         // GET: api/PizzaTypes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PizzaType>>> GetPizzaTypes()
+        public async Task<IActionResult> GetPizzaTypes(int page = 1, int pageSize = 20)
         {
-            return await _context.PizzaTypes.ToListAsync();
+            var totals = await _context.OrderDetails
+            .GroupBy(od => od.PizzaId)
+            .Select(g => new { PizzaId = g.Key, TotalSold = g.Sum(od => od.Quantity) })
+            .ToDictionaryAsync(g => g.PizzaId, g => g.TotalSold);
+
+            var pizzaTypes = await _context.PizzaTypes
+            .Include(pt => pt.Pizzas)
+            .OrderBy(p => p.PizzaTypeId)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+            var result = pizzaTypes.Select(pt => new PizzaTypeDto
+            {
+                PizzaTypeId = pt.PizzaTypeId,
+                Name = pt.Name,
+                Category = pt.Category,
+                Ingredients = pt.Ingredients,
+                Pizzas = pt.Pizzas.Select(pi => new PizzaDto
+                {
+                    PizzaId = pi.PizzaId,
+                    Size = pi.Size,
+                    Price = pi.Price,
+                    TotalSold = totals.TryGetValue(pi.PizzaId, out var sold) ? sold : 0
+                }).ToList()
+            }).ToList();
+
+            return Ok(result);
         }
+
 
         // GET: api/PizzaTypes/5
         [HttpGet("{id}")]

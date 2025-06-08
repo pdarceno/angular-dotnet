@@ -28,12 +28,15 @@ namespace backend.Controllers
 
         // GET: api/OrderDetails
         [HttpGet]
-        public async Task<IActionResult> GetOrderDetails()
+        public async Task<IActionResult> GetOrderDetails(int page = 1, int pageSize = 20)
         {
             var orders = await _context.Orders
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Pizza)
                         .ThenInclude(p => p.PizzaType)
+                .OrderBy(o => o.OrderId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(o => new OrderDto
                 {
                     OrderId = o.OrderId,
