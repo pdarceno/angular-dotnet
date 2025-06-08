@@ -1,1 +1,21 @@
-<p>order-details works!</p>
+<h2>Order Dashboard</h2>
+<table border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Pizza Count</th>
+      <th>Total Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let order of orders">
+      <td>{{ order.orderId }}</td>
+      <td>{{ order.date }}</td>
+      <td>{{ order.time }}</td>
+      <td>{{ order.pizzaCount }}</td>
+      <td>{{ order.totalPrice | currency: 'USD' }}</td>
+    </tr>
+  </tbody>
+</table>
