@@ -50,8 +50,7 @@ namespace backend.Controllers
                 .Select(o => new OrderDto
                 {
                     OrderId = o.OrderId,
-                    Date = o.Date,
-                    Time = o.Time,
+                    DateTime = o.DateTime,
                     Details = o.OrderDetails.Select(od => new OrderDetailDto
                     {
                         OrderDetailId = od.OrderDetailId,
@@ -83,8 +82,7 @@ namespace backend.Controllers
             var dto = new OrderDto
             {
                 OrderId = order.OrderId,
-                Date = order.Date,
-                Time = order.Time,
+                DateTime = order.DateTime,
                 Details = order.OrderDetails.Select(od => new OrderDetailDto
                 {
                     OrderDetailId = od.OrderDetailId,
@@ -100,7 +98,7 @@ namespace backend.Controllers
 
         [HttpGet("search")]
         public async Task<IActionResult> SearchOrderDetails(
-        [FromQuery] DateOnly? date = null,
+        [FromQuery] DateTime? dateTime = null,
         [FromQuery] string? pizzaName = null,
         [FromQuery] string? size = null,
         [FromQuery] int page = 1,
@@ -112,8 +110,8 @@ namespace backend.Controllers
                         .ThenInclude(p => p.PizzaType)
                 .AsQueryable();
 
-            if (date.HasValue)
-                query = query.Where(o => o.Date == date.Value);
+            if (dateTime.HasValue)
+                query = query.Where(o => o.DateTime == dateTime.Value);
 
             if (!string.IsNullOrWhiteSpace(pizzaName))
                 query = query.Where(o =>
@@ -132,8 +130,7 @@ namespace backend.Controllers
                 .Select(o => new OrderDto
                 {
                     OrderId = o.OrderId,
-                    Date = o.Date,
-                    Time = o.Time,
+                    DateTime = o.DateTime,
                     Details = o.OrderDetails.Select(od => new OrderDetailDto
                     {
                         OrderDetailId = od.OrderDetailId,

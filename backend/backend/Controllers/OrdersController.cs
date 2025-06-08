@@ -36,10 +36,20 @@ namespace backend.Controllers
             using (var stream = new StreamReader(file.OpenReadStream(), Encoding.UTF8))
             using (var csv = new CsvReader(stream, CultureInfo.InvariantCulture))
             {
-                csv.Context.RegisterClassMap<OrderCsvMap>();
+                csv.Context.RegisterClassMap<OrderCsvDtoMap>();
+                var csvOrders = csv.GetRecords<OrderCsvDto>().ToList();
+
                 try
                 {
-                    orders = csv.GetRecords<Order>().ToList();
+                    orders = csvOrders.Select(dto => new Order
+                    {
+                        OrderId = dto.OrderId,
+                        DateTime = DateTime.ParseExact(
+                        $"{dto.Date} {dto.Time}",
+                        "yyyy-MM-dd HH:mm:ss",
+                        CultureInfo.InvariantCulture
+                    )
+                    }).ToList();
                 }
                 catch (Exception ex)
                 {
@@ -81,8 +91,7 @@ namespace backend.Controllers
         public OrderCsvMap()
         {
             Map(m => m.OrderId).Name("order_id");
-            Map(m => m.Date).Name("date").TypeConverterOption.Format("yyyy-MM-dd");
-            Map(m => m.Time).Name("time").TypeConverterOption.Format("HH:mm:ss");
+            Map(m => m.DateTime).Name("datetime").TypeConverterOption.Format("yyyy-MM-dd HH:mm:ss");
         }
     }
 }

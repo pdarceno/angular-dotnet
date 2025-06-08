@@ -10,11 +10,8 @@ namespace backend.Models
         [Key]
         public int OrderId { get; set; }
 
-        [Column(TypeName = "date")]
-        public DateOnly Date { get; set; }
-
-        [Column(TypeName = "time")]
-        public TimeOnly Time { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime DateTime { get; set; }
 
         public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
     }
