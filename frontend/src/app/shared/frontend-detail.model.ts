@@ -1,33 +1,34 @@
-import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment.development';
+// mapped to backend's DTO
+export interface Order {
+  orderId: number;
+  date: string; // ISO date string (e.g., '2024-01-01')
+  time: string; // string representation of time (e.g., '12:30:00')
+  totalPrice: number;
+  pizzaCount: number;
+  details: OrderDetail[];
+}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class FrontendDetailService {
-  url: string = environment.apiBaseUrl;
-  constructor(private http: HttpClient) {}
+export interface OrderDetail {
+  orderDetailId: number;
+  pizzaName: string;
+  size: string;
+  quantity: number;
+  price: number;
+}
 
-  getOrderDetails() {
-    this.http.get(this.url + '/OrderDetails').subscribe({
-      next: (data) => {
-        console.log('Data received:', data);
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
-    });
-  }
+export interface Pizza {
+  pizzaId: number;
+  pizzaTypeName: number;
+  category: string;
+  size: string;
+  price: number;
+  totalSold: number;
+}
 
-  getPizzaDetails() {
-    this.http.get(this.url + '/Pizzas').subscribe({
-      next: (data) => {
-        console.log('Data received:', data);
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
-    });
-  }
+export interface PizzaType {
+  pizzaTypeId: number;
+  name: string;
+  category: string;
+  ingredients: string;
+  pizzas: Pizza[];
 }

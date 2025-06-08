@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FrontendDetailService } from '../shared/frontend-detail.model';
-
+import { FrontendDetailService } from '../shared/fronend-detail';
 @Component({
   selector: 'app-pizza-details',
   imports: [],
