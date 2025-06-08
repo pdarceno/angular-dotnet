@@ -68,15 +68,20 @@ namespace backend.Controllers
         {
             var daily = await _context.Orders
                 .GroupBy(o => o.DateTime.Date)
-                .Select(g => new {
+                .Select(g => new
+                {
                     Date = g.Key,
                     Orders = g.Count()
                 })
-                .OrderBy(x => x.Date)
+                .OrderByDescending(x => x.Date)
+                .Take(10)
+                .OrderBy(x => x.Date) // re-sort for chart display
                 .ToListAsync();
 
             return Ok(daily);
         }
+
+
 
         [HttpGet("underperformers")]
         public async Task<IActionResult> GetUnderperformers()
