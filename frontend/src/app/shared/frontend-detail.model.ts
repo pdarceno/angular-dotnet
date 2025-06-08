@@ -6,11 +6,22 @@ import { environment } from '../../environments/environment.development';
   providedIn: 'root',
 })
 export class FrontendDetailService {
-  url: string = environment.apiBaseUrl + '/OrderDetails';
+  url: string = environment.apiBaseUrl;
   constructor(private http: HttpClient) {}
 
-  getDetails() {
-    this.http.get(this.url).subscribe({
+  getOrderDetails() {
+    this.http.get(this.url + '/OrderDetails').subscribe({
+      next: (data) => {
+        console.log('Data received:', data);
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      },
+    });
+  }
+
+  getPizzaDetails() {
+    this.http.get(this.url + '/Pizzas').subscribe({
       next: (data) => {
         console.log('Data received:', data);
       },
