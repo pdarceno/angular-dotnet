@@ -22,6 +22,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+//should be fine as development only
+app.UseCors(options =>
+    options.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader());
+
 app.UseAuthorization();
 
 app.MapControllers();
